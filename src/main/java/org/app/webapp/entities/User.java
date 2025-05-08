@@ -5,6 +5,7 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private boolean active;
 
     public User(int id, String name, String email, String password) {
         this.id = id;
@@ -43,5 +44,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean getActive() {
+        return active;
     }
 }

@@ -1,0 +1,12 @@
+a {
+    color: red;
+}
+
+#table-user {
+    width: 500px;
+    border-collapse: collapse;
+}
+
+#table-user tr,td {
+    border: 1px solid black;
+}

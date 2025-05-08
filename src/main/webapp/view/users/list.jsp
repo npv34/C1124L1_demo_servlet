@@ -1,48 +1,49 @@
-<%@ page import="java.util.List" %>
-<%@ page import="org.app.webapp.entities.User" %><%--
-  Created by IntelliJ IDEA.
-  User: luanpv
-  Date: 5/6/25
-  Time: 19:31
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%
-    List<User> listUser = (List<User>) request.getAttribute("listUser");
-    int total = listUser.size();
-    int stt = 1;
-%>
+<%@ taglib prefix="c" uri = "http://java.sun.com/jsp/jstl/core" %>
+<c:set var="listUser" value="${requestScope['listUser']}"/>
+<c:set var="keyword" value="${requestScope['keyword']}"/>
+<c:set var="total" value="${listUser.size()}"/>
+<c:set var="stt" value="1"/>
 <html>
 <head>
     <title>Title</title>
+    <link rel="stylesheet" href="/statics/css/style.css">
 </head>
 <body>
 <h1>User List</h1>
-<p>Total: <%= total%> users</p>
+<p>Total: <c:out value="${total}"/> users</p>
 <a href="/users/create">Create </a>
 <form action="/users/search" method="get">
-    <input type="text" name="keyword">
+    <input type="text" value="${keyword}" name="keyword">
     <button type="submit">Search</button>
 </form>
-<table>
+<table id="table-user">
     <tr>
         <td>STT</td>
         <td>Name</td>
         <td>Email</td>
+        <td>Status</td>
         <td></td>
     </tr>
-    <% for (User item: listUser) { %>
+    <c:forEach items="${listUser}" var="item">
         <tr>
-            <td><%= stt %></td>
-            <td><%= item.getName() %></td>
-            <td><%= item.getEmail() %></td>
+            <td><c:out value="${stt}"/></td>
+            <td><c:out value="${item.getName()}"/></td>
+            <td><c:out value="${item.getEmail()}"/></td>
             <td>
-                <a href="/users/delete?id=<%= item.getId()%>">Delete</a>
-                <a href="/users/update?id=<%= item.getId()%>">Update</a>
+                <c:if test="${item.getActive()}">
+                    <c:out value="Active"/>
+                </c:if>
+                <c:if test="${!item.getActive()}">
+                    <c:out value="De-Active"/>
+                </c:if>
+            </td>
+            <td>
+                <a onclick="return confirm('Are you sure?')" href="/users/delete?id=<c:out value="${item.getId()}" />">Delete</a>
+                <a href="/users/update?id=<c:out value="${item.getId()}" />">Update</a>
             </td>
         </tr>
-        <% stt++; %>
-    <% } %>
+        <c:set var="stt" value="${stt + 1}"/>
+    </c:forEach>
 </table>
 </body>
 </html>

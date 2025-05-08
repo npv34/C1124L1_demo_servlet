@@ -25,6 +25,7 @@ public class UserServlet extends HttpServlet {
     protected void initData(int number) {
         for (int i = 0; i < number; i++) {
             User u = new User(i+ 1, "u-" + i, "u@gmail", "232323");
+            u.setActive(false);
             listUser.add(u);
         }
     }
@@ -44,6 +45,9 @@ public class UserServlet extends HttpServlet {
                 break;
             case "/delete":
                 deleteUser(req, resp);
+                break;
+            case "/search":
+                searchUser(req, resp);
                 break;
             default:
                 renderPageListUser(req, resp);
@@ -125,5 +129,19 @@ public class UserServlet extends HttpServlet {
         String name = request.getParameter("name");
         userUpdate.setName(name);
         response.sendRedirect("/users");
+    }
+
+    public void searchUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String keyword = request.getParameter("keyword");
+        List<User> result = new ArrayList<>();
+        for (User user: listUser) {
+            if (user.getName().contains(keyword)) {
+                result.add(user);
+            }
+        }
+        request.setAttribute("listUser", result);
+        request.setAttribute("keyword", keyword);
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/view/users/list.jsp");
+        requestDispatcher.forward(request, response);
     }
 }
