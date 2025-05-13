@@ -21,7 +21,7 @@
         <td>STT</td>
         <td>Name</td>
         <td>Email</td>
-        <td>Status</td>
+        <td>Phone</td>
         <td></td>
     </tr>
     <c:forEach items="${listUser}" var="item">
@@ -30,12 +30,7 @@
             <td><c:out value="${item.getName()}"/></td>
             <td><c:out value="${item.getEmail()}"/></td>
             <td>
-                <c:if test="${item.getActive()}">
-                    <c:out value="Active"/>
-                </c:if>
-                <c:if test="${!item.getActive()}">
-                    <c:out value="De-Active"/>
-                </c:if>
+                <c:out value="${item.getPhone()}"/>
             </td>
             <td>
                 <a onclick="return confirm('Are you sure?')" href="/users/delete?id=<c:out value="${item.getId()}" />">Delete</a>

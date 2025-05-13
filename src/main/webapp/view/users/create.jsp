@@ -16,6 +16,10 @@
     <input type="text" name="name">
     Email:
     <input type="email" name="email">
+    Phone:
+    <input type="text" name="phone">
+    Address:
+    <input type="text" name="address">
     Password:
     <input type="password" name="password">
     <button type="submit">Save</button>

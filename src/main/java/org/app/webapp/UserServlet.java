@@ -6,28 +6,21 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.app.webapp.databases.DBConnect;
 import org.app.webapp.entities.User;
+import org.app.webapp.services.UserService;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 // users/
 @WebServlet(name = "UserServlet", urlPatterns = {"/users/*"})
 public class UserServlet extends HttpServlet {
-    private List<User> listUser;
     @Override
     public void init() throws ServletException {
-        this.listUser = new ArrayList<>();
-        initData(20);
-    }
 
-    protected void initData(int number) {
-        for (int i = 0; i < number; i++) {
-            User u = new User(i+ 1, "u-" + i, "u@gmail", "232323");
-            u.setActive(false);
-            listUser.add(u);
-        }
     }
 
     @Override
@@ -73,9 +66,14 @@ public class UserServlet extends HttpServlet {
 
     public void renderPageListUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // parse data xuong jspServlet
-        request.setAttribute("listUser", listUser);
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/view/users/list.jsp");
-        requestDispatcher.forward(request, response);
+        try {
+            List<User> listUser = UserService.getAllUsers();
+            request.setAttribute("listUser", listUser);
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/view/users/list.jsp");
+            requestDispatcher.forward(request, response);
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void renderPageCreateUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -85,63 +83,60 @@ public class UserServlet extends HttpServlet {
     }
 
     public void renderPageUpdateUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // lay id tru url
-        int id = Integer.parseInt(request.getParameter("id"));
-        User userUpdate = getUserById(id);
-        // parse userUpdate xuong jspServlet
-        request.setAttribute("userUpdate", userUpdate);
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/view/users/update.jsp");
-        requestDispatcher.forward(request, response);
+        try {
+            User userUpdate = UserService.findUserById(request, response);
+            if (userUpdate != null) {
+                RequestDispatcher requestDispatcher = request.getRequestDispatcher("/view/users/update.jsp");
+                request.setAttribute("userUpdate", userUpdate);
+                requestDispatcher.forward(request, response);
+            }
+        }catch (SQLException | ServletException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void deleteUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        User userRemove = getUserById(id);
-        listUser.remove(userRemove);
-        response.sendRedirect("/users");
+        try {
+            UserService.deleteUser(request, response);
+            response.sendRedirect("/users");
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private User getUserById(int id) {
-        User userRemove = null;
-        for (User item: listUser) {
-            if (item.getId() == id) {
-                userRemove = item;
-                break;
-            }
-        }
-        return userRemove;
-    }
 
     public void createUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // lay data tu req
-        String name = request.getParameter("name");
-        String email = request.getParameter("email");
-        String pass = request.getParameter("password");
-        int maxID = listUser.get(listUser.size() - 1).getId();
-        User newUser = new User(maxID + 1, name, email, pass);
-        listUser.add(newUser);
-        response.sendRedirect("/users");
+        try {
+            UserService.create(request, response);
+            response.sendRedirect("/users");
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void updateUser(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        User userUpdate = getUserById(id);
-        String name = request.getParameter("name");
-        userUpdate.setName(name);
-        response.sendRedirect("/users");
+        try {
+            UserService.updateUser(request, response);
+            response.sendRedirect("/users");
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void searchUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String keyword = request.getParameter("keyword");
-        List<User> result = new ArrayList<>();
-        for (User user: listUser) {
-            if (user.getName().contains(keyword)) {
-                result.add(user);
-            }
+        try {
+            List<User> listUser = UserService.searchUserByName(request, response);
+            request.setAttribute("listUser", listUser);
+            RequestDispatcher requestDispatcher = request.getRequestDispatcher("/view/users/list.jsp");
+            requestDispatcher.forward(request, response);
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        request.setAttribute("listUser", result);
-        request.setAttribute("keyword", keyword);
-        RequestDispatcher requestDispatcher = request.getRequestDispatcher("/view/users/list.jsp");
-        requestDispatcher.forward(request, response);
+    }
+
+    @Override
+    public void destroy() {
+        DBConnect.closeConnection();
     }
 }

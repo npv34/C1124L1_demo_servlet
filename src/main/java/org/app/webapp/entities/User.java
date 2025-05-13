@@ -5,9 +5,15 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private boolean active;
+    private String phone;
+    private String address;
 
-    public User(int id, String name, String email, String password) {
+    public User() {
+    }
+
+    public User(int id, String name,
+                String email,
+                String password) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -46,11 +52,19 @@ public class User {
         this.password = password;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public boolean getActive() {
-        return active;
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getAddress() {
+        return address;
     }
 }

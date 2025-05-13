@@ -19,6 +19,10 @@
     <input type="text" name="name" value="<%= user.getName() %>">
     Email:
     <input type="email" value="<%= user.getEmail() %>" disabled>
+    Phone:
+    <input type="text" name="phone" value="<%= user.getPhone() %>">
+    Address:
+    <input type="text" name="address" value="<%= user.getAddress() %>">
     <button type="submit">Update</button>
 </form>
 </body>

@@ -6,8 +6,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.app.webapp.entities.User;
+import org.app.webapp.services.UserService;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 @WebServlet(name = "AuthServlet", urlPatterns = {"/auth/*"})
 public class AuthServlet extends HttpServlet {
@@ -54,15 +57,15 @@ public class AuthServlet extends HttpServlet {
     public void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // code logic
         // b1: lay data tu request
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-
-        // logic
-        if ("luan@gmail.com".equals(email) && "1234".equals(password)) {
-            // thay doi location -> 302
-            response.sendRedirect("/hello");
-        } else {
-            response.sendRedirect("/auth/login");
+        try {
+            User user = UserService.findUserByEmailAndPassword(request, response);
+            if (user != null) {
+                response.sendRedirect("/users");
+            } else {
+                response.sendRedirect("/auth/login?error=1");
+            }
+        }catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }
